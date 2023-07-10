@@ -39,6 +39,15 @@ This package is designed to support the following workflow:
    This is used to prevent your form from being used to spam GitHub
    repositories with feedback.
 
+   **IReSA**: Für IReSA reicht derzeit folgende Konfiguration:
+   ```
+   github issues:
+     default repository owner: meinrecht
+     feedback session linking: True
+     ask panel: True
+
+   ```
+
 3. Add a link on each page, in the footer or `under` area.  
    You can use the `feedback_link()` function to add a link, like this:
    `[:comment-dots: Feedback](${ feedback_link(user_info()) } ){:target="_blank"}`
