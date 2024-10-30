@@ -1,9 +1,9 @@
 # docassemble.GithubFeedbackForm
 
+based on
 [![PyPI version](https://badge.fury.io/py/docassemble.GithubFeedbackForm.svg)](https://badge.fury.io/py/docassemble.GithubFeedbackForm)
 
-A package that uses the GitHub API to gather feedback and then submit issues to Github that can be embedded
-into a Docassemble interview. Makes it easy to collect per-page feedback.
+A package that uses the GitHub API to gather feedback and then submit issues to Github that can be embedded into a Docassemble interview. Makes it easy to collect per-page feedback.
 
 This package is designed to support the following workflow:
 

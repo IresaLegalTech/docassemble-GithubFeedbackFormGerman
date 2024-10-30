@@ -8,14 +8,11 @@ include:
 ---
 metadata:
   title: User Feedback
-  exit url: |
-    https://verfahrenslotse.org
+  exit url: url_of('dispatch')
 ---
 features:
   labels above fields: True
   question back button: True
----
-code: al_feedback_form_title = "Verfahrenslotse"
 ---
 code: |
   # This email will be used ONLY if there is no valid GitHub config
@@ -51,7 +48,7 @@ image sets:
 code: default_repository = 'docassemble-AssemblyLine'
 ---
 code: |
-  default_github_user_or_organization = get_config('github issues',{}).get('default repository owner') or 'suffolklitlab'
+  default_github_user_or_organization = get_config('github issues',{}).get('default repository owner') or 'meinrecht'
 ---
 code: server_share_answers = get_config("github issues", {}).get("feedback session linking", False)
 ---
@@ -74,78 +71,28 @@ code: orig_session_id = url_args.get('session_id')
 id: intro
 decoration: opinion
 question: |
-  ${ al_feedback_form_title } - Erzähle uns, wie wir uns schlagen
+  Feedback zur aktuellen Frage
 subquestion: |
-  Die Informationen, die du hier eingibst, werden öffentlich sichtbar sein. 
-  Das heißt, jeder wird sie sehen können. Nutze dieses Formular, um uns 
-  von Problemen zu berichten, ohne persönliche Informationen hinzuzufügen.
+  Hier kannst du angeben, was du an der aktuellen Frage, den vorgeschlagenen Antworten
+  oder dem Kontext, in dem sie auftaucht, verbesserungswürdig findest.
   
-  ${ collapse_template(al_how_to_get_legal_help) }
-
-  Danke, dass du uns von deiner Erfahrung mit dieser Website berichtest.
+  Danke für deine Hilfe!
 
 fields:
-  - no label: reason
+  - "**Wovon möchtest du uns erzählen?**": reason
     input type: radio
     choices:
-      - Ich möchte etwas mitteilen: something
-      - Ich brauche Hilfe: help
+      - Fehler: bug
+      - Sprachliche Korrektur: language
+      - Ich habe eine andere Anmerkung: something
   - "**Was möchtest du uns mitteilen?**": details
     rows: 4
     input type: area
-    show if:
-      variable: reason
-      is: something
-  - note: |
-      Wenn du einen Bug gefunden hast, kannst du deine Antworten 
-      einem Administrator mitteilen (die Antworten werden nicht
-      veröffentlicht), um uns zu helfen, das Problem zu 
-      identifizieren. 
-      [BR]
-      Wir werden dich in keinem Fall kontaktieren.
-    show if:
-      code: |
-        server_share_answers and not get_config('debug')
-      variable: reason
-      is: something
-  - label: |
-      Antworten mit einem Administrator teilen
-    label above field: False
-    field: share_interview_answers
-    datatype: yesno
-    show if:
-      code: |
-        server_share_answers and not get_config('debug')
-      variable: reason
-      is: something
-  - label: |
-      Ich bin interessiert an einem User-Feedback-Panel teilzunehmen
-    label above field: False
-    field: would_be_on_panel
-    datatype: yesno
-    default: False
-    show if:
-      code: |
-        server_ask_panel and not get_config('debug')
-      variable: reason
-      is: something
-  - note: |
-      Wir werden dich für das Feedback-Panel per E-Mail kontaktieren.
-    show if:
-      variable: would_be_on_panel
-      is: True
-  - label: |
-      **Wie ist deine E-Mail-Adresse?**
-    field: panel_email
-    datatype: email
-    default: ${ user_info().email if hasattr(user_info(), 'email') else '' }
-    show if:
-      variable: would_be_on_panel
-      is: True
 continue button field: intro
 ---
+# diesen Zweig nie verwenden (statt 'debug' 'github_issues_longversion' hinzugefügt)
 if: |
-  get_config('debug')
+  get_config('github_issues_longversion')
 id: intro
 question: |
   Tester Feedback Formular
@@ -172,14 +119,6 @@ fields:
         not question_id
   - "**Wann sollte das Problem behoben werden?**": maturity_level
     code: maturity_levels
-    help: |
-      Wir nutzen ein [5-Level-Rating](https://suffolklitlab.org/legal-tech-class/docs/legal-tech-overview/maturity-model/#example-maturity-model-for-the-massaccess-project)
-      für unsere fertigen Formulare. Formulare
-      sind normalerweise fertig zur Veröffentlichung,
-      wenn sie Level 1 erreicht haben, aber alle Arten
-      von Feedback sind wertvoll. Feedback zu kategorisieren
-      hilft uns, die wichtigsten Aufgaben in der richtigen
-      Reihenfolge abzuarbeiten. 
   - "**Wie lautet die sprachliche Korrektur?**": details
     datatype: area
     rows: 4
@@ -221,11 +160,11 @@ continue button field: intro
 ---
 variable name: maturity_levels
 data:
-  - Level 1 - Das muss behoben werden, um dem Level 1 Blank Form zu entsprechen.
-  - Level 1.5 - Alles funktioniert, es ist aber ein signifikanter Sprachfehler.
-  - Level 2 - Das muss behoben werden, um die Erwartungen eines grundlegenden Aufnahmeprozesses zu entsprechen.
-  - Level 3 - Das muss behoben werden, um den Erwartungen eines erfahrenen Prüfers zu entsprechen.
-  - Level 4 - Das ist lediglich eine Verbesserung für die Nutzererfahrung.
+  - Level 1 - Es handelt sich um einen grundlegenden Fehler.
+  - Level 1.5 - Es liegt ein bedeutsamer sprachlicher Fehler vor.
+  - Level 2 - Der Mangel sollte behoben werden, damit die Funktionalität des Interviews den Erwartungen der Benutzer entspricht.
+  - Level 3 - Der Mangel sollte behoben werden, um auch anspruchsvolle Erwartungen zu erfüllen.
+  - Level 4 - Es handelt sich um eine Verbesserung für die Nutzererfahrung.
 ---
 template: al_how_to_get_legal_help
 subject: |
@@ -255,15 +194,12 @@ event: end_results
 question: |
   Danke für dein Feedback
 decoration: opinion
-subquestion: |
-  Wir schätzen es, dass du uns mitteilst, was wir verbessern können. 
+subquestion: |  
+  Bitte verlasse dieses Interview, indem du den Exitknopf betätigst. 
   
-  % if issue_url:
-  Wenn du dieses Issue verfolgen möchtest, kannst du ihm 
-  auf Github [folgen](${issue_url}).
-  % endif
+  Danach kannst du das Fenster schließen und das Originalinterview fortsetzen.
 buttons:
-  - Exit: exit
+  - Feedback schließen: exit
 ---
 objects:
   - generic_report: DADict
