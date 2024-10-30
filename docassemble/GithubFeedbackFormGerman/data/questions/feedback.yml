@@ -8,7 +8,7 @@ include:
 ---
 metadata:
   title: User Feedback
-  exit url: url_of('dispatch')
+  exit url: url_of('exit')
 ---
 features:
   labels above fields: True
