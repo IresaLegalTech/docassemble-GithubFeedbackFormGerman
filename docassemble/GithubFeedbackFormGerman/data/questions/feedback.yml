@@ -92,7 +92,7 @@ decoration: opinion
 subquestion: |  
   Bitte verlasse dieses Interview, indem du den Exitknopf betätigst. 
   
-  Danach kannst du das Fenster schließen und das Originalinterview fortsetzen.
+  Danach gelangst du in das Originalinterview und kannst es fortsetzen.
   
 buttons:
   - Feedback schließen: exit
