@@ -2,7 +2,7 @@ import importlib
 import json
 import requests
 from typing import Dict, Optional, List, Union
-from docassemble.base.util import log, get_config, interview_url
+from docassemble.base.util import log, get_config, interview_url, DAStore
 
 # reference: https://gist.github.com/JeffPaine/3145490
 # https://docs.github.com/en/free-pro-team@latest/rest/reference/issues#create-an-issue
@@ -16,7 +16,6 @@ __all__ = [
     "is_likely_spam",
 ]
 USERNAME = get_config("github issues", {}).get("username")
-
 
 def _get_token() -> Optional[str]:
     return (get_config("github issues") or {}).get("token")
@@ -101,6 +100,9 @@ def feedback_link(
     if not i:
         i = "docassemble.GithubFeedbackFormGerman:feedback.yml"
 
+    DAStore().set("interview_url_orig", interview_url())
+    log(f"Interviewurl in feedback_link: {interview_url()}")
+    
     return interview_url(
         i=i,
         github_repo=_github_repo,

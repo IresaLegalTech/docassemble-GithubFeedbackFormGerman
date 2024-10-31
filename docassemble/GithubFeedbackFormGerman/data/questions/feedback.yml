@@ -1,10 +1,10 @@
 ---
+objects:
+  userdata: DAStore
+---
 modules:
   - .github_issue
   - .feedback_on_server
----
-include:
-  - docassemble.ALToolbox:collapse_template.yml
 ---
 metadata:
   title: User Feedback
@@ -21,10 +21,7 @@ id: interview order
 mandatory: True
 code: |
   intro
-  if reason == 'help':
-    gentle_exit
-  else:
-    issue_template = generic_report[reason]
+  issue_template = generic_report[reason]
   send_to_github
   prevent_going_back()
   store_variables_snapshot(persistent=True)
@@ -42,9 +39,7 @@ image sets:
       love: love.svg
       enhancement: enhance.svg
 ---
-# This is the repository that Github issue will be created on if
-# the repository is not passed as a URL argument
-code: default_repository = 'docassemble-AssemblyLine'
+code: default_repository = 'docassemble-IresaDefault'
 ---
 code: |
   default_github_user_or_organization = get_config('github issues',{}).get('default repository owner') or 'meinrecht'
@@ -89,105 +84,6 @@ fields:
     input type: area
 continue button field: intro
 ---
-# diesen Zweig nie verwenden (statt 'debug' 'github_issues_longversion' hinzugefügt)
-if: |
-  get_config('github_issues_longversion')
-id: intro
-question: |
-  Tester Feedback Formular
-decoration: opinion
-subquestion: |
-  Dieses Formular wurde designt um von Testern und 
-  Community-Mitgliedern benutzt zu werden. 
-  
-  Die Informationen, die du hier eingibst, werden öffentlich sichtbar sein. 
-  Das heißt, jeder wird sie sehen können. 
-  
-  ${ collapse_template(al_how_to_get_legal_help) }
-  
-fields:
-  - "**Wovon möchtest du uns erzählen?**": reason
-    input type: radio
-    choices:
-      - Bug: bug
-      - Sprachliche Korrektur: language
-      - Ich habe eine andere Anmerkung: something
-  - "**Wie war der Titel oben auf der Seite, auf der der Bug aufgetreten ist?**": page_title
-    show if:
-      code: |
-        not question_id
-  - "**Wann sollte das Problem behoben werden?**": maturity_level
-    code: maturity_levels
-  - "**Wie lautet die sprachliche Korrektur?**": details
-    datatype: area
-    rows: 4
-    show if:
-      variable: reason
-      is: language
-  - note: |
-      **Welche Schritte hast du befolgt bis der Bug auftrat? Was hätte passieren sollen? Was ist stattdessen passiert?** [BR]
-      
-      Z. B.: 
-      
-      1. Auf der ersten Seite habe ich meinen Namen eingegeben. 
-      2. Ich habe auf "Weiter" geklickt.
-      3. Ich habe erwartet, dass ich meine Telefonnummer eingeben soll. Stattdessen sah ich eine Fehlerausgabe, und zwar "..."
-    show if:
-      variable: reason
-      is: bug
-  - "**Was ist der Bug?**": details
-    datatype: area
-    rows: 4
-    show if:
-      variable: reason
-      is: bug
-  - "**Was möchtest du anmerken?**": details
-    datatype: area
-    rows: 4
-    show if:
-      variable: reason
-      is: something
-  - note: |
-      Deine Antworten werden einem Server-Administrator mitgeteilt, 
-      um ihm zu helfen, das Problem zu identifizieren. Sie werden nicht veröffentlicht.
-    show if:
-      code: |
-        server_share_answers
-      variable: reason
-      is: bug
-continue button field: intro
----
-variable name: maturity_levels
-data:
-  - Level 1 - Es handelt sich um einen grundlegenden Fehler.
-  - Level 1.5 - Es liegt ein bedeutsamer sprachlicher Fehler vor.
-  - Level 2 - Der Mangel sollte behoben werden, damit die Funktionalität des Interviews den Erwartungen der Benutzer entspricht.
-  - Level 3 - Der Mangel sollte behoben werden, um auch anspruchsvolle Erwartungen zu erfüllen.
-  - Level 4 - Es handelt sich um eine Verbesserung für die Nutzererfahrung.
----
-template: al_how_to_get_legal_help
-subject: |
-  Brauchst du noch mehr Hilfe?
-content: |
-  Vielleicht helfen dir diese freien Ressourcen: 
-  
-  - [Find Free Legal help - Legal Services Corporation](https://www.lsc.gov/about-lsc/what-legal-aid/get-legal-help)
-
-  - [Hire a lawyer](https://www.americanbar.org/groups/legal_services/flh-home/flh-hire-a-lawyer/)
----
-id: exit
-event: gentle_exit
-question: |
-  Wie du mehr Hilfe bekommen kannst
-decoration: lifebuoy
-subquestion: |
-  Es tut uns leid, dass wir nicht mehr tun konnten, um dir zu helfen. 
-  
-  ${ al_how_to_get_legal_help }
-
-buttons:
-  - Exit: exit
----
 id: end_results
 event: end_results
 question: |
@@ -197,8 +93,11 @@ subquestion: |
   Bitte verlasse dieses Interview, indem du den Exitknopf betätigst. 
   
   Danach kannst du das Fenster schließen und das Originalinterview fortsetzen.
+  
+  Session: ${ userdata.get("interview_url_orig") }
 buttons:
   - Feedback schließen: exit
+    url: ${ userdata.get("interview_url_orig") }
 ---
 objects:
   - generic_report: DADict
@@ -217,8 +116,6 @@ content: |
   -------|------------------------------------
   % if question_id:
   Question ID | `${ question_id }`
-  % elif defined('page_title'): 
-  Page title | ${ page_title }
   % endif
   Details | ${ details }
   % if variable:
@@ -226,9 +123,6 @@ content: |
   % endif
   % if package_version:
   Package version | `${ package_version }`
-  % endif
-  % if defined('maturity_level'):
-  Maturity target | ${ maturity_level }
   % endif
   % if filename:
   Filename | `${ filename }`
@@ -244,8 +138,6 @@ code: |
   if not task_performed('sent to github', persistent=True):
     if actually_share_answers:
       saved_uuid
-    if showifdef('would_be_on_panel', False):
-      add_panel_participant(panel_email)
     issue_url
     if issue_url:
       if actually_share_answers and saved_uuid:
@@ -270,7 +162,7 @@ code: |
   issue_url = make_github_issue(github_user, github_repo, template=issue_template, label=al_github_label)
 ---
 code: |
-  actually_share_answers = server_share_answers and (get_config('debug') or showifdef('share_interview_answers', False))
+  actually_share_answers = server_share_answers and (get_config('debug'))
 ---
 code: |
   al_github_label = 'user feedback'

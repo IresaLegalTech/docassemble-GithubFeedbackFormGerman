@@ -5,12 +5,19 @@ modules:
 # Hier ist das Zuständigkeiteninterview als Beispiel eingefügt. Das sollte geändert werden.
 default screen parts:
   footer: |
-    [:comment-dots: Feedback](${ feedback_link(user_info(), github_repo="docassemble-sgb8x86bis88axzustaendigkeiten") } ){:target="_blank"}
+    [:comment-dots: Feedback](${ feedback_link(user_info(), github_repo="docassemble-sgb8x86bis88axzustaendigkeiten") } )
 ---
 question: Feedback gefällig?
+subquestion: |
+  Info: 
+  
+  Interview URL: ${ interview_url() }
 yesno: feedback_aktiv
 ---
 mandatory: True
 question: Zusammenfassung
 subquestion: |
   Feedback ist ${feedback_aktiv}
+buttons:
+  - Exit: exit
+  
