@@ -94,7 +94,6 @@ subquestion: |
   
   Danach kannst du das Fenster schließen und das Originalinterview fortsetzen.
   
-  Session: ${ userdata.get("interview_url_orig") }
 buttons:
   - Feedback schließen: exit
     url: ${ userdata.get("interview_url_orig") }
